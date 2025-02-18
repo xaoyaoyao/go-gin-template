@@ -7,7 +7,7 @@ servers:
   - url: http://{hostname}/api
     variables:
       hostname:
-        default: localhost:8080
+        default: localhost:9999
         description: local test
   - url: https://{dev-host}/api
     variables:
