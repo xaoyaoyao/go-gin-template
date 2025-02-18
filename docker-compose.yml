@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+  web-gin:
+    container_name: go-gin-api
+    image: go-gin-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "10"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        monitor: 15s
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+        reservations:
+          cpus: "0.25"
+          memory: "256M"
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+    ports:
+      - "9999:9999"

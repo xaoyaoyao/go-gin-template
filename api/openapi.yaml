@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Xaoyaoyao Cloud API
+  description: Xaoyaoyao Cloud API
+servers:
+  - url: http://{hostname}/api
+    variables:
+      hostname:
+        default: localhost:8080
+        description: local test
+  - url: https://{dev-host}/api
+    variables:
+      dev-host:
+        default: test.example.com
+        enum:
+          - test.example.dev
+  - url: https://{prod-host}/api
+    variables:
+      prod-host:
+        default: api.example.com
+        enum:
+          - api.example.com
+
+
+security:
+  - BearerAuth: [ ]
+
+paths:
+  /v1/initialize:
+    get:
+      summary: Program starts to obtain loading data
+      description: Program starts to obtain loading data
+      operationId: InitializationData
+      tags:
+        - Initialization
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/BasicQueryParams'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InitializationDataVO'
+                allOf:
+                  - $ref: '#/components/schemas/ResponseEntity'
+
+  /v1/users/signup:
+    post:
+      summary: User signup
+      description: User signup
+      operationId: Signup
+      tags:
+        - User
+      parameters:
+        - name: GO-API-KEY
+          in: header
+          required: true
+          description: API KEY
+          schema:
+            type: string
+      requestBody:
+        description: User registration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+              properties:
+                deviceId:
+                  type: string
+                  description: the device's id
+                  example: "223RTT898GDy67GuohuiD8778"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CredentialVO'
+                allOf:
+                  - $ref: '#/components/schemas/ResponseEntity'
+        404:
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseEntity"
+        500:
+          description: ServerError
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseEntity"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "JWT"
+
+  headers:
+    User-Agent:
+      description: User Agent header
+      required: false
+      schema:
+        type: string
+
+  parameters:
+    BasicQueryParams:
+      name: queryParams
+      in: query
+      schema:
+        $ref: '#/components/schemas/BasicQueryParams'
+
+    PageQueryParams:
+      name: pageParams
+      in: query
+      schema:
+        $ref: '#/components/schemas/PageQueryParams'
+
+    PriorityQueryParams:
+      name: priorityParams
+      in: query
+      schema:
+        $ref: '#/components/schemas/PriorityQueryParams'
+
+  schemas:
+    BasicQueryParams:
+      type: object
+      properties:
+        version:
+          type: string
+          description: The app's version
+          example: "1.0.0.1"
+        os:
+          type: string
+          description: Device version information
+          example: "iOS17.0.1"
+        language:
+          type: string
+          description: Language, zh_cn, en, default en
+          example: "en"
+        sid:
+          type: string
+          description: Session ID
+          example: "PCTWDITJMWXSNFN5ZD46XEJN"
+
+
+    PriorityQueryParams:
+      type: object
+      properties:
+        size:
+          type: integer
+          default: 15
+          example: 15
+          description: Page size, default 15, max 50
+        priority:
+          type: integer
+          format: int64
+          default: 0
+          example: 0
+          description: Priority
+
+    PageQueryParams:
+      required:
+        - page
+        - limit
+      type: object
+      properties:
+        page:
+          type: integer
+          default: 1
+          example: 1
+          description: Page number for pagination
+        limit:
+          type: integer
+          default: 15
+          example: 15
+          description: Number of items per page
+        sort:
+          type: string
+          enum:
+            - asc
+            - desc
+          default: asc
+          example: asc
+          description: Sorting order
+
+    ResponseEntity:
+      required:
+        - code
+        - msg
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Response code.
+          format: int32
+          example: 200
+        msg:
+          type: string
+          description: Message about the response.
+          example: Success.
+
+    InitializationDataVO:
+      type: object
+      additionalProperties: true
+
+    CredentialVO:
+      required:
+        - id
+        - accessToken
+        - refreshToken
+        - expiresIn
+        - refreshTokenExpiresIn
+      type: object
+      properties:
+        id:
+          type: string
+          description: user id
+          example: "FGoiuzvR85IL3excKUeao"
+        accessToken:
+          type: string
+          description: access token
+          example: "FGoiuzvR85IL3excKUeao-J5EMJb_prqhOr2QUNOqASH5ZFozLJrY3Lb19pABdqwsfiEvdc9WFJZB6LKeIo7-g=="
+        refreshToken:
+          type: string
+          description: refresh token
+          example: "CPDOAhE_80yVLOvecwhP88arwNGZqj7e9LLDMLSVs05ZKP7Cko_5TYKBvrA2Z_7s4-Uj4CNS6iuk0PEhogQPVA=="
+        expiresIn:
+          type: integer
+          description: The validity period of the access token, in seconds
+          example: 3600
+        refreshTokenExpiresIn:
+          type: integer
+          description: The validity period of the refresh token, in seconds
+          example: 72000
+        tokenType:
+          type: string
+          description: Token type, usually bearer
+          example: "bearer"
+        scope:
+          type: string
+          description: Authorization scope of access token
+          example: "read write"
+
+
+

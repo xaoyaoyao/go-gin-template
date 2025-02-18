@@ -1,0 +1,9 @@
+# code
+200_code: Success
+400_code: Bad Request
+401_code: Unauthorized
+403_code: Forbidden
+404_code: Not found
+415_code: Unsupported Media Type
+500_code: Internal Server Error
+503_code: Service Unavailable
